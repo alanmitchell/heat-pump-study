@@ -15,7 +15,7 @@ clear;
 file_name='CR1000_DLG_DHP_TenSecond.dat'; %Specify the file from which you want to read data
 
 %Global variables:
-global x logging_interval T_out P_input P_output; %dynamicDataDisplay function will need these to calculate the performance data for the selected interval
+global x logging_interval T_out P_input P_output Airspeed; %dynamicDataDisplay function will need these to calculate the performance data for the selected interval
 
 %Constants:
 c_p = 0.240; %Specific heat of air in Btu/lb-F
@@ -45,7 +45,8 @@ P_input=data(:,9); %Input electrical power in W
 Airspeed=data(:,10); %Air speed in fpm
 
 %Calculate the airflow from the air speed:
-Airflow=1.0566*Airspeed+18.333; %Air flow in cfm from proxy calibration
+%Airflow=1.0566*Airspeed+18.333; %Air flow in cfm from proxy calibration done in Sep 2014 incorrectly
+Airflow=1.3083*Airspeed+5.1391; %Air flow in cfm from proxy calibration done in Jan 2015 correctly
 Nonzero_speed=Airspeed>40; %Speed less than 40 fpm counts as zero speed
 Airflow=Airflow.*Nonzero_speed; %Zero speed means zero flow
 
@@ -65,16 +66,19 @@ plot1=subplot(2,1,1);
 plot(x,[T_coil,T_out,T_deliv,T_return],'.');
 hold on;
 plot(x,Airflow,'.','MarkerSize',1);
+%plot(x,Airspeed,'.');
 xlabel('date & time');
 ylabel('T [F], Airflow [cfm]');
-clickableLegend({'T_{coil}','T_{out}','T_{deliv}','T_{return}','Airflow'}); %This function was downloaded from http://www.mathworks.com/matlabcentral/fileexchange/21799-clickablelegend
+h=clickableLegend({'T_{coil}','T_{out}','T_{deliv}','T_{return}','Airflow'}); %This function was downloaded from http://www.mathworks.com/matlabcentral/fileexchange/21799-clickablelegend
+p=get(h,'Position'); set(h,'Position',[1-p(3)-0.01,p(2),p(3),p(4)]); %Position the legend outside the graph
 grid on;
 %Plot the second graph:
 plot2=subplot(2,1,2);
 plot(x,[P_input,P_output,COP*100],'.');
 xlabel('date & time');
 ylabel('P [W], COP [%]');
-clickableLegend({'P_{input}','P_{output}','COP'}); %This function was downloaded from http://www.mathworks.com/matlabcentral/fileexchange/21799-clickablelegend
+h=clickableLegend({'P_{input}','P_{output}','COP'}); %This function was downloaded from http://www.mathworks.com/matlabcentral/fileexchange/21799-clickablelegend
+p=get(h,'Position'); set(h,'Position',[1-p(3)-0.01,p(2),p(3),p(4)]); %Position the legend outside the graph
 grid on;
 %Synchronize zoom for both graphs:
 linkaxes([plot1,plot2],'x');
@@ -94,3 +98,4 @@ fprintf('Overall COP: %f \n',Total_COP);
 %Dynamically display performance data (COP, etc.) for the interval that the
 %user zoomes onto:
 dynamicDataDisplay(plot2);
+
