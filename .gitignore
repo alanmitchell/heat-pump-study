@@ -1,4 +1,8 @@
+# git commit script
 commit
+
+*.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
