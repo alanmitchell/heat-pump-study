@@ -1,6 +1,7 @@
 # git commit script
 commit
 
+*.pkl
 *.json
 
 # Byte-compiled / optimized / DLL files
